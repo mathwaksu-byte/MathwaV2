@@ -1,0 +1,14 @@
+# Supabase Database URL
+DATABASE_URL=postgresql://user:password@db.xxx.supabase.co:5432/postgres
+
+# Supabase Project URL
+SUPABASE_URL=https://xxx.supabase.co
+
+# Supabase Anonymous Key (public)
+SUPABASE_ANON_KEY=your_anon_key_here
+
+# Supabase Service Role Key (secret - admin access)
+SUPABASE_SERVICE_KEY=your_service_role_key_here
+
+# JWT Secret for token signing
+JWT_SECRET=your_jwt_secret_here

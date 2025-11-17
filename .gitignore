@@ -1,0 +1,14 @@
+client/node_modules/
+admin/node_modules/
+api-workers/node_modules/
+**/node_modules/
+client/public/build/
+client/build/
+admin/build/
+**/build/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+api-workers/.dev.vars
+api-workers/.wrangler/

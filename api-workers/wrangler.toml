@@ -1,0 +1,17 @@
+name = "mathwa-api"
+main = "src/index.ts"
+compatibility_date = "2023-12-18"
+compatibility_flags = ["nodejs_compat"]
+
+# Environment variables (set these via wrangler secret put or dashboard)
+[env.production]
+name = "mathwa-api"
+compatibility_flags = ["nodejs_compat"]
+
+# For local development, create a .dev.vars file with:
+# DATABASE_URL=your_supabase_db_url
+# SUPABASE_URL=your_supabase_url
+# SUPABASE_ANON_KEY=your_anon_key
+# SUPABASE_SERVICE_KEY=your_service_key
+# JWT_SECRET=your_jwt_secret
+# DIRECT_URL=your_direct_database_url (for migrations)

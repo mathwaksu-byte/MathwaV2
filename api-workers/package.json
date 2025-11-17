@@ -1,0 +1,29 @@
+{
+  "name": "mathwa-api-workers",
+  "version": "1.0.0",
+  "description": "Cloudflare Workers API for MATHWA",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.8.0",
+    "@prisma/adapter-pg": "^5.8.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "itty-router": "^4.0.0",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0",
+    "wrangler": "^3.22.0",
+    "typescript": "^5.3.3",
+    "prisma": "^5.8.0"
+  }
+}
