@@ -1,11 +1,9 @@
 import { createPagesFunctionHandler } from "@remix-run/cloudflare-pages";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// @ts-ignore
+import * as build from "../build/index.js";
 
-export const onRequest = async (context: any) => {
-  const p = "../build/index.js";
-  const build = (await import(p)) as any;
-  const handle = createPagesFunctionHandler({
-    build,
-    mode: process.env.NODE_ENV,
-  });
-  return handle(context);
-};
+export const onRequest = createPagesFunctionHandler({
+  build,
+  mode: process.env.NODE_ENV,
+});
