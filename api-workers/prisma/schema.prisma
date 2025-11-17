@@ -1,175 +1,113 @@
-// Prisma Schema for MATHWA - Kyrgyz State University Partnership
-// Database: Supabase PostgreSQL
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("SUPABASE_DB_SESSION_POOLER_URL")
+  directUrl = env("SUPABASE_DB_DIRECT_URL")
+  shadowDatabaseUrl = env("SUPABASE_DB_TX_POOLER_URL")
 }
 
-// ============================================
-// USER MODEL
-// ============================================
-model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  phone     String?
-  role      UserRole @default(STUDENT)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  applications Application[]
-
-  @@map("users")
-}
-
-enum UserRole {
-  ADMIN
-  EDITOR
-  STUDENT
-}
-
-// ============================================
-// UNIVERSITY MODEL
-// ============================================
 model University {
-  id          String   @id @default(uuid())
-  name        String
-  country     String
-  city        String
-  description String?  @db.Text
-  ranking     Int?
-  tuitionFee  Decimal? @db.Decimal(10, 2)
-  imageUrl    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  programs     Program[]
-  gallery      Gallery[]
-  applications Application[]
-
-  @@map("universities")
+  id             String   @id @default(uuid())
+  slug           String   @unique
+  name           String
+  active         Boolean  @default(true)
+  overview       String?
+  accreditation  String[] @default([])
+  hero_image_url String?
+  logo_url       String?
+  gallery_urls   String[] @default([])
+  duration_years Int?
+  intake_months  String[] @default([])
+  eligibility    String?
+  hostel_info    String?
+  created_at     DateTime @default(now())
+  fees           Fee[]
 }
 
-// ============================================
-// PROGRAM MODEL
-// ============================================
-model Program {
-  id           String   @id @default(uuid())
-  universityId String
-  name         String
-  duration     String // e.g., "4 years", "2 semesters"
-  fee          Decimal? @db.Decimal(10, 2)
-  eligibility  String?  @db.Text
-  description  String?  @db.Text
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+model Fee {
+  id            String     @id @default(uuid())
+  university_id String
+  year          Int
+  tuition       Decimal    @default(0)
+  hostel        Decimal    @default(0)
+  misc          Decimal    @default(0)
+  currency      String     @default("USD")
+  university    University @relation(fields: [university_id], references: [id], onDelete: Cascade)
 
-  // Relations
-  university   University    @relation(fields: [universityId], references: [id], onDelete: Cascade)
-  applications Application[]
-
-  @@index([universityId])
-  @@map("programs")
+  @@unique([university_id, year])
 }
 
-// ============================================
-// GALLERY MODEL
-// ============================================
-model Gallery {
-  id           String    @id @default(uuid())
-  universityId String?
-  imageUrl     String
-  title        String?
-  createdAt    DateTime  @default(now())
+model Lead {
+  id                        String    @id @default(uuid())
+  name                      String
+  phone                     String
+  email                     String?
+  city                      String?
+  neet_qualified            Boolean?
+  marksheet_url             String?
+  preferred_university_slug String?
+  preferred_year            Int?
+  source                    String?
+  status                    String    @default("new")
+  utm                       Json?
+  consent                   Boolean   @default(true)
+  created_at                DateTime  @default(now())
+  assigned_admin_id         String?
+  notes                     String    @default("")
+  priority                  String    @default("normal")
+  last_contacted_at         DateTime?
+  next_action_at            DateTime?
 
-  // Relations
-  university University? @relation(fields: [universityId], references: [id], onDelete: SetNull)
-
-  @@index([universityId])
-  @@map("gallery")
-}
-
-// ============================================
-// PRICE SETTINGS MODEL
-// ============================================
-model PriceSettings {
-  id              String   @id @default(uuid())
-  consultationFee Decimal  @db.Decimal(10, 2)
-  serviceCharge   Decimal  @db.Decimal(10, 2)
-  applicationFee  Decimal  @db.Decimal(10, 2)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@map("price_settings")
-}
-
-// ============================================
-// CONTENT BLOCKS MODEL
-// ============================================
-model ContentBlock {
-  id        String   @id @default(uuid())
-  key       String   @unique // e.g., "homepage_hero", "about_section"
-  title     String
-  body      String?  @db.Text
-  imageUrl  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("content_blocks")
-}
-
-// ============================================
-// APPLICATIONS MODEL
-// ============================================
-model Application {
-  id           String            @id @default(uuid())
-  userId       String
-  programId    String
-  universityId String
-  status       ApplicationStatus @default(PENDING)
-  documents    Json? // Array of document URLs
-  notes        String?           @db.Text
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-
-  // Relations
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  program    Program    @relation(fields: [programId], references: [id], onDelete: Cascade)
-  university University @relation(fields: [universityId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([programId])
-  @@index([universityId])
+  @@index([created_at])
   @@index([status])
-  @@map("applications")
 }
 
-enum ApplicationStatus {
-  PENDING
-  APPROVED
-  REJECTED
+model Admin {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password_hash String
+  role          String   @default("admin")
+  created_at    DateTime @default(now())
 }
 
-// ============================================
-// MESSAGES / CONTACT FORM MODEL
-// ============================================
-model Message {
-  id        String   @id @default(uuid())
-  name      String
-  email     String
-  phone     String?
-  message   String   @db.Text
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
+model FAQ {
+  id         String   @id @default(uuid())
+  question   String
+  answer     String
+  active     Boolean  @default(true)
+  created_at DateTime @default(now())
+}
 
-  @@index([isRead])
-  @@map("messages")
+model Testimonial {
+  id         String   @id @default(uuid())
+  name       String
+  quote      String?
+  video_url  String?
+  photo_url  String?
+  active     Boolean  @default(true)
+  created_at DateTime @default(now())
+}
+
+model Article {
+  id         String   @id @default(uuid())
+  title      String
+  slug       String   @unique
+  content    String?
+  active     Boolean  @default(true)
+  created_at DateTime @default(now())
+}
+
+model SiteSetting {
+  key                     String   @id @default("default")
+  hero_title              String?
+  hero_subtitle           String?
+  hero_video_mp4_url      String?
+  hero_video_webm_url     String?
+  hero_video_poster_url   String?
+  background_theme_id     String?
+  background_gradient_css String?
+  updated_at              DateTime @default(now())
 }
