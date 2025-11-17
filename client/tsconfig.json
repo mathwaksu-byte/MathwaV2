@@ -11,12 +11,14 @@
     "strict": true,
     "types": ["vite/client", "@remix-run/node", "@remix-run/react"],
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": ["./app/*"],
+      "server-build": ["./build/index.js"]
     }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "**/*.d.ts",
     "remix.env.d.ts"
   ]
 }
